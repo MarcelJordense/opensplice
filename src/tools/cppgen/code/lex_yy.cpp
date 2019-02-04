@@ -2778,7 +2778,7 @@ static void idl_parse_line_and_file (char *buf)
   }
 
   /*
-   * If it's an import file store the stripped name for the BE to use
+   * If it's an import file store the name for the BE to use
    */
   if 
   (
@@ -2787,7 +2787,14 @@ static void idl_parse_line_and_file (char *buf)
      (fstackdepth < 2)
   ) 
   {
-    nm = new UTL_String (stripped_name (idl_global->filename ()));
+    if (idl_global->maintain_include_namespace())
+    {
+      nm = new UTL_String (idl_global->filename ());
+    }
+    else
+    {
+      nm = new UTL_String (stripped_name (idl_global->filename ()));
+    }
     idl_global->store_include_file_name (nm);
   }
 }

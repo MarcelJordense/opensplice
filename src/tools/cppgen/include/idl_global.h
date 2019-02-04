@@ -292,6 +292,8 @@ public:
 
    virtual void store_include_file_name(UTL_String *);
 
+   virtual void store_include_path_name(UTL_String *);
+
    virtual UTL_String **include_file_names(); // Array of file names
    virtual void set_include_file_names(UTL_String **); // Set it
 
@@ -309,6 +311,9 @@ public:
 
    virtual bool ignore_interfaces();
    virtual void set_ignore_interfaces(bool);
+
+   virtual void set_maintain_include_namespace(bool val);
+   virtual bool maintain_include_namespace();
 
    bool IncludeFileMerge();
    void IncludeFileMerge(bool yes_or_no);
@@ -345,16 +350,23 @@ private:
    bool pd_warn; // Print out warnings?
    UTL_String ** pd_include_file_names; // Array of file names
    unsigned long pd_n_include_file_names; // How many
-   unsigned long pd_n_alloced_file_names; // How many alloced
+   unsigned long pd_n_alloced_file_names; // How many allocated
+
+   UTL_String ** pd_include_path_names; // Array of include path names
+   unsigned long pd_n_include_path_names; // How many
+   unsigned long pd_n_alloced_path_names; // How many allocated
+
    bool pd_merge_includes;
 
    ParseState pd_parse_state;  // Parse state we're in
    CompilationStage pd_compilation_stage;
    bool pd_case_sensitive; // Is case sensitivity on?
    bool pd_ignore_interfaces; // Do not generate interface defs
+   bool pd_maintain_include_namespace; // Keep the include namespace
 
    // Operations
    long seen_include_file_before(UTL_String *);
+   long seen_include_path_before(UTL_String *);
    // Seen this include
    // before?
 };

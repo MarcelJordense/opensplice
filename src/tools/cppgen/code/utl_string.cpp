@@ -177,6 +177,24 @@ bool UTL_String::compare(UTL_String *s)
    return result;
 }
 
+bool UTL_String::starts_with(UTL_String *s)
+{
+   char *s_p_str;
+   bool result;
+   size_t len;
+
+   if (c_str == NULL || s == NULL || (s_p_str = s->get_string()) == NULL)
+      result = false;
+   else {
+      len = strlen(s_p_str);
+      result = (strncmp(p_str, s_p_str, len) == 0) ? true : false;
+   }
+
+   return result;
+}
+
+
+
 // Get the char * from a String
 char *
 UTL_String::get_string()

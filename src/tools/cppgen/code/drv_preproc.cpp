@@ -128,6 +128,8 @@ void DRV_cpp_putarg(const char * arg)
    char *str_orig = str;
    char *cp;
    char *dp;
+   UTL_String * nm;
+   size_t len;
    
    // Always define _DDS_CPP_ and _DDS_
 
@@ -170,6 +172,18 @@ void DRV_cpp_putarg(const char * arg)
          if (*str)
          {
            Ifile(str);
+           len = strlen(str);
+           if (!((len == 1) && (*str == '.'))) {
+               if (str[len] != '/') {
+                   char *npath = (char *)os_malloc(len+2);
+                   sprintf(npath, "%s/", str);
+                   nm = new UTL_String (npath);
+                   os_free(npath);
+               } else {
+                   nm = new UTL_String (str);
+               }
+               idl_global->store_include_path_name (nm);
+           }
          }
          else
          {

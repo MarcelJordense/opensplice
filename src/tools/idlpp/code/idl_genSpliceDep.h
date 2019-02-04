@@ -22,6 +22,12 @@
 #define IDL_GENSPLICEDEP_H
 
 #include "idl_program.h"
+#include "c_iterator.h"
+
+struct SpliceDepUserData {
+    c_bool keepIncludePaths;
+    c_iter includePaths;
+};
 
 idl_program idl_genSpliceDepProgram (void *userData);
 

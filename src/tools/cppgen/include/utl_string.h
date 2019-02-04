@@ -107,6 +107,8 @@ public:
 
    virtual bool compare (UTL_String *s);
 
+   virtual bool starts_with(UTL_String *s);
+
    inline operator const char * ()
    {
       return get_string ();

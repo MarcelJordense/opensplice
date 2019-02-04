@@ -98,10 +98,14 @@ IDL_GlobalData::IDL_GlobalData()
       pd_include_file_names(NULL),
       pd_n_include_file_names(0),
       pd_n_alloced_file_names(0),
+      pd_include_path_names(NULL),
+      pd_n_include_path_names(0),
+      pd_n_alloced_path_names(0),
       pd_merge_includes(false),
       pd_parse_state(PS_NoState),
       pd_case_sensitive(false),
-      pd_ignore_interfaces(false)
+      pd_ignore_interfaces(false),
+      pd_maintain_include_namespace(false)
 
 {
    // empty
@@ -404,19 +408,45 @@ IDL_GlobalData::seen_include_file_before(UTL_String *n)
    return false;
 }
 
+long
+IDL_GlobalData::seen_include_path_before(UTL_String *n)
+{
+   unsigned long i;
+
+   for (i = 0; i < pd_n_include_path_names; i++)
+      if (n->compare(pd_include_path_names[i]))
+         return true;
+
+   return false;
+}
+
 // Store a name of an #include file
 void
 IDL_GlobalData::store_include_file_name(UTL_String *n)
 {
    UTL_String **o_include_file_names;
-   unsigned long o_n_alloced_file_names,
-   i;
+   unsigned long o_n_alloced_file_names, i;
+   UTL_String *nm = NULL;
+
+   if (pd_maintain_include_namespace) {
+      for (i = 0; i < pd_n_include_path_names; i++) {
+         if (n->starts_with(pd_include_path_names[i])) {
+	    char *prefix = pd_include_path_names[i]->get_string();
+	    size_t len = strlen(prefix);
+	    char *name = &(n->get_string()[len]);
+	    nm = new UTL_String(name);
+	    break;
+	  }
+      }
+   }
+
+   if (nm == NULL) nm = n;
 
    /*
     * Check if we need to store it at all or whether we've seen it already
     */
 
-   if (seen_include_file_before(n))
+   if (seen_include_file_before(nm))
       return ;
 
    /*
@@ -446,7 +476,51 @@ IDL_GlobalData::store_include_file_name(UTL_String *n)
    /*
     * Store it
     */
-   pd_include_file_names[pd_n_include_file_names++] = n;
+   pd_include_file_names[pd_n_include_file_names++] = nm;
+}
+
+// Store a name of an #include file
+void
+IDL_GlobalData::store_include_path_name(UTL_String *n)
+{
+   UTL_String **o_include_path_names;
+   unsigned long o_n_alloced_path_names, i;
+
+   /*
+    * Check if we need to store it at all or whether we've seen it already
+    */
+
+   if (seen_include_path_before(n))
+      return ;
+
+   /*
+    * OK, need to store. Make sure there's space for one more string
+    */
+   if (pd_n_include_path_names == pd_n_alloced_path_names)
+   {
+      if (pd_n_alloced_path_names == 0)
+      {
+         pd_n_alloced_path_names = INCREMENT;
+         pd_include_path_names = new UTL_String * [pd_n_alloced_path_names];
+      }
+      else
+      {
+         o_include_path_names = pd_include_path_names;
+         o_n_alloced_path_names = pd_n_alloced_path_names;
+         pd_n_alloced_path_names += INCREMENT;
+         pd_include_path_names = new UTL_String * [pd_n_alloced_path_names];
+
+         for (i = 0; i < o_n_alloced_path_names; i++)
+            pd_include_path_names[i] = o_include_path_names[i];
+
+         delete [] o_include_path_names;
+      }
+   }
+
+   /*
+    * Store it
+    */
+   pd_include_path_names[pd_n_include_path_names++] = n;
 }
 
 void
@@ -519,6 +593,18 @@ bool
 IDL_GlobalData::ignore_interfaces()
 {
    return pd_ignore_interfaces;
+}
+
+void
+IDL_GlobalData::set_maintain_include_namespace(bool val)
+{
+    pd_maintain_include_namespace = val;
+}
+
+bool
+IDL_GlobalData::maintain_include_namespace()
+{
+   return pd_maintain_include_namespace;
 }
 
 /*
