@@ -32,41 +32,6 @@
 #include "os_string.h"
 #include "os_stdlib.h"
 
-#if 0
-static char *
-idl_stripIncludePath(
-    idl_typeUser typeUser,
-    const char *basename,
-    void *userData)
-{
-    struct SpliceDepUserData *info = userData;
-    char *result = NULL;
-
-    if (info && info->keepIncludePaths) {
-        char *filename = os_str_rtrim(idl_typeUserFileName(typeUser), ".idl");
-        c_iterIter iterator = c_iterIterGet(info->includePaths);
-        char *pathname;
-
-        while((pathname = c_iterNext(&iterator))) {
-            os_size_t l = strlen(pathname);
-            if (strncmp(filename, pathname, l) == 0) {
-                if (filename[l] == '/') {
-                    l++;
-                }
-                result = os_strdup(&filename[l]);
-                break;
-           }
-        }
-        os_free(filename);
-    }
-
-    if (!result) {
-        result = os_strdup(basename);
-    }
-    return result;
-}
-#endif
-
 static char *
 idl_stripIncludePath(
     idl_typeUser typeUser,
