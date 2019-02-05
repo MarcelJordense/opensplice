@@ -27,11 +27,12 @@
 #include "idl_scope.h"
 #include "idl_dependencies.h"
 #include "idl_genSpliceDep.h"
+#include "idl_fileMap.h"
 #include "os_heap.h"
 #include "os_string.h"
 #include "os_stdlib.h"
 
-
+#if 0
 static char *
 idl_stripIncludePath(
     idl_typeUser typeUser,
@@ -63,6 +64,30 @@ idl_stripIncludePath(
         result = os_strdup(basename);
     }
     return result;
+}
+#endif
+
+static char *
+idl_stripIncludePath(
+    idl_typeUser typeUser,
+    const char *basename,
+    void *userData)
+{
+    struct SpliceDepUserData *info = userData;
+    c_char *inclName = NULL;
+
+    if (info && info->keepIncludePaths) {
+        c_type ctype = idl_typeSpecDef(idl_typeSpec(typeUser));
+        c_char *name = idl_fileMapResolveInclude (idl_fileMapDefGet(), c_baseObject(ctype));
+        if (name && (*name != '\0')) {
+            inclName = os_str_rtrim(name, ".idl");
+        }
+    }
+
+    if (!inclName) {
+        inclName = os_strdup(basename);
+    }
+    return inclName;
 }
 
 /* fileOpen callback

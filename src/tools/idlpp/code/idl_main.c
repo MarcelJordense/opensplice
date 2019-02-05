@@ -1175,7 +1175,7 @@ OPENSPLICE_MAIN (ospl_idlpp)
          * the dependencies are used to generate include statements
          */
         {
-            struct SpliceDepUserData info = {maintain_include_namespace, includeDefinitions};
+            struct SpliceDepUserData info = {maintain_include_namespace};
             idl_walk(base, filename, source, traceWalk, idl_genSpliceDepProgram(&info));
         }
 
